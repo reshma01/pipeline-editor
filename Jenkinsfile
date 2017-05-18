@@ -1,18 +1,31 @@
 pipeline {
-  agent { docker 'cloudbees/java-build-tools' }
+  agent none
   stages {
     stage('build') {
       steps {
-        sh 'mvn clean install' 
+        parallel(
+          "build": {
+            sh 'mvn clean install'
+            
+          },
+          "": {
+            echo 'test'
+            
+          }
+        )
       }
     }
   }
   post {
     success {
       archive 'target/blueocean-pipeline-editor.hpi'
+      
     }
+    
     always {
       junit 'target/**/*.xml'
+      
     }
+    
   }
 }
